@@ -7,14 +7,14 @@ export const createUrl = async (req: Request, res: Response) => {
   const { url } = req.body;
   console.log("========url", url);
   if (url) {
-    const existURL = await prisma.user.findFirst({
+    const existURL = await prisma.uRLShortner.findFirst({
       where: { redirectURL: url },
     });
     if (existURL && existURL.shortId) {
       res.status(200).json({ success: true, shortId: existURL.shortId });
     } else {
       const shortId = nanoid(8);
-      const result = await prisma.user.create({
+      const result = await prisma.uRLShortner.create({
         data: {
           shortId,
           visitHistory: "",
@@ -44,7 +44,7 @@ export const redirectURL = (req: Request, res: Response) => {
   const shortId = req.params.shortId;
   // console.log("=========tttttttttttttttttt", shortId);
   if (shortId) {
-    prisma.user
+    prisma.uRLShortner
       .findFirst({
         where: { shortId },
       })
@@ -54,7 +54,7 @@ export const redirectURL = (req: Request, res: Response) => {
           res.redirect(existShortId.redirectURL);
         }
       })
-      .catch((err) => console.error(err));
+      .catch((err:unknown) => console.error(err));
   }
 };
 
@@ -66,7 +66,7 @@ export const redirectURL = (req: Request, res: Response) => {
 export const URLAnalytics = async (req: Request, res: Response) => {
   try {
     const { shortId } = req.params;
-    const existShortId = await prisma.user.findFirst({
+    const existShortId = await prisma.uRLShortner.findFirst({
       where: { shortId },
     });
     if (existShortId && existShortId.visitHistory) {
